@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>글쓰기 도구 키트</title>
+  <style>
+    body { font-family: sans-serif; max-width: 720px; margin: auto; padding: 2em; }
+    textarea { width: 100%; height: 150px; }
+    .tool { margin-bottom: 2em; }
+    h2 { border-bottom: 1px solid #ddd; padding-bottom: 0.3em; }
+    .result { background: #f9f9f9; padding: 1em; white-space: pre-wrap; }
+  </style>
+</head>
+<body>
+  <h1>✍️ 나만의 글쓰기 도구</h1>
+
+  <!-- 글자 수 세기 도구 -->
+  <div class="tool">
+    <h2>1. 글자 수 세기</h2>
+    <textarea id="charInput" placeholder="여기에 글을 입력하세요"></textarea>
+    <p>공백 포함: <span id="charWithSpace">0</span>자 / 공백 제외: <span id="charWithoutSpace">0</span>자</p>
+  </div>
+
+  <!-- 자동 줄바꿈 도구 -->
+  <div class="tool">
+    <h2>2. 자동 줄바꿈 (50자 단위)</h2>
+    <textarea id="wrapInput" placeholder="여기에 긴 글을 입력하세요"></textarea>
+    <button onclick="autoLineBreak()">줄바꿈 적용</button>
+    <div class="result" id="wrapResult"></div>
+  </div>
+
+  <!-- 텍스트 머지 도구 -->
+  <div class="tool">
+    <h2>3. 텍스트 머지</h2>
+    <label>이름: <input type="text" id="nameInput" placeholder="홍길동" /></label>
+    <p>템플릿: <code>안녕하세요, [이름]님. 좋은 하루 되세요.</code></p>
+    <button onclick="applyMerge()">적용하기</button>
+    <div class="result" id="mergeResult"></div>
+  </div>
+
+  <script>
+    // 글자 수 세기
+    const charInput = document.getElementById("charInput");
+    const withSpace = document.getElementById("charWithSpace");
+    const withoutSpace = document.getElementById("charWithoutSpace");
+    charInput.addEventListener("input", () => {
+      withSpace.textContent = charInput.value.length;
+      withoutSpace.textContent = charInput.value.replace(/\\s/g, "").length;
+    });
+
+    // 자동 줄바꿈
+    function autoLineBreak() {
+      const text = document.getElementById("wrapInput").value;
+      const wrapped = text.match(/.{1,50}/g).join("\\n");
+      document.getElementById("wrapResult").textContent = wrapped;
+    }
+
+    // 텍스트 머지
+    function applyMerge() {
+      const name = document.getElementById("nameInput").value || "사용자";
+      const template = `안녕하세요, [이름]님. 좋은 하루 되세요.`;
+      const merged = template.replace("[이름]", name);
+      document.getElementById("mergeResult").textContent = merged;
+    }
+  </script>
+</body>
+</html>
