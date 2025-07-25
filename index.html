@@ -1,68 +1,151 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>글쓰기 도구 키트</title>
-  <style>
-    body { font-family: sans-serif; max-width: 720px; margin: auto; padding: 2em; }
-    textarea { width: 100%; height: 150px; }
-    .tool { margin-bottom: 2em; }
-    h2 { border-bottom: 1px solid #ddd; padding-bottom: 0.3em; }
-    .result { background: #f9f9f9; padding: 1em; white-space: pre-wrap; }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>텍스트 유틸리티 - 자동 줄바꿈</title>
+    <meta name="description" content="50자 단위로 텍스트를 자동 줄바꿈해주는 도구입니다. 글자 수 세기 기능과 함께 편리하게 사용하세요.">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+        }
+        textarea {
+            width: 100%;
+            height: 200px;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+            box-sizing: border-box; /* 패딩이 너비에 포함되도록 */
+            resize: vertical; /* 세로 크기 조절 가능 */
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-right: 10px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        #output {
+            background-color: #e9ecef;
+            padding: 15px;
+            border-radius: 4px;
+            margin-top: 20px;
+            white-space: pre-wrap; /* 줄바꿈 유지 및 긴 텍스트 자동 줄바꿈 */
+            word-wrap: break-word; /* 긴 단어 강제 줄바꿈 */
+            min-height: 100px;
+            border: 1px solid #ced4da;
+            font-size: 16px;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+            color: #6c757d;
+        }
+        .feature-section {
+            margin-top: 30px;
+            border-top: 1px solid #eee;
+            padding-top: 20px;
+        }
+        h2 {
+            color: #34495e;
+            margin-top: 25px;
+        }
+        h3 {
+            color: #555;
+            margin-top: 20px;
+        }
+    </style>
 </head>
 <body>
-  <h1>✍️ 나만의 글쓰기 도구</h1>
+    <div class="container">
+        <h1>텍스트 자동 줄바꿈 도구</h1>
 
-  <!-- 글자 수 세기 도구 -->
-  <div class="tool">
-    <h2>1. 글자 수 세기</h2>
-    <textarea id="charInput" placeholder="여기에 글을 입력하세요"></textarea>
-    <p>공백 포함: <span id="charWithSpace">0</span>자 / 공백 제외: <span id="charWithoutSpace">0</span>자</p>
-  </div>
+        <p>이 도구는 입력된 텍스트를 지정된 글자 수(50자) 단위로 **자동 줄바꿈**하여 가독성을 높여줍니다. 길고 복잡한 텍스트를 정리할 때 유용하며, **글자 수 세기** 기능도 함께 제공하여 편리합니다.</p>
 
-  <!-- 자동 줄바꿈 도구 -->
-  <div class="tool">
-    <h2>2. 자동 줄바꿈 (50자 단위)</h2>
-    <textarea id="wrapInput" placeholder="여기에 긴 글을 입력하세요"></textarea>
-    <button onclick="autoLineBreak()">줄바꿈 적용</button>
-    <div class="result" id="wrapResult"></div>
-  </div>
+        <div class="feature-section">
+            <h2>자동 줄바꿈 기능</h2>
+            <p>여기에 텍스트를 입력하고 '줄바꿈 적용' 버튼을 눌러보세요.</p>
+            <textarea id="inputText" placeholder="여기에 텍스트를 입력하세요."></textarea>
+            <button onclick="applyWordWrap()">줄바꿈 적용</button>
+            <button onclick="clearText()">초기화</button>
 
-  <!-- 텍스트 머지 도구 -->
-  <div class="tool">
-    <h2>3. 텍스트 머지</h2>
-    <label>이름: <input type="text" id="nameInput" placeholder="홍길동" /></label>
-    <p>템플릿: <code>안녕하세요, [이름]님. 좋은 하루 되세요.</code></p>
-    <button onclick="applyMerge()">적용하기</button>
-    <div class="result" id="mergeResult"></div>
-  </div>
+            <h3>결과 미리보기</h3>
+            <div id="output"></div>
+        </div>
 
-  <script>
-    // 글자 수 세기
-    const charInput = document.getElementById("charInput");
-    const withSpace = document.getElementById("charWithSpace");
-    const withoutSpace = document.getElementById("charWithoutSpace");
-    charInput.addEventListener("input", () => {
-      withSpace.textContent = charInput.value.length;
-      withoutSpace.textContent = charInput.value.replace(/\\s/g, "").length;
-    });
+        <div class="feature-section">
+            <h2>글자 수 세기 기능</h2>
+            <p>이전에 완성하신 글자 수 세기 기능을 여기에 통합할 수 있습니다. 예를 들어, `inputText`의 글자 수를 실시간으로 보여주는 필드를 추가할 수 있겠죠.</p>
+            <p>현재 글자 수: <span id="charCount">0</span></p>
+        </div>
+    </div>
 
-    // 자동 줄바꿈
-    function autoLineBreak() {
-      const text = document.getElementById("wrapInput").value;
-      const wrapped = text.match(/.{1,50}/g).join("\\n");
-      document.getElementById("wrapResult").textContent = wrapped;
-    }
+    <div class="footer">
+        <p>&copy; 2025 텍스트 유틸리티. 모든 권리 보유.</p>
+    </div>
 
-    // 텍스트 머지
-    function applyMerge() {
-      const name = document.getElementById("nameInput").value || "사용자";
-      const template = `안녕하세요, [이름]님. 좋은 하루 되세요.`;
-      const merged = template.replace("[이름]", name);
-      document.getElementById("mergeResult").textContent = merged;
-    }
-  </script>
+    <script>
+        // JavaScript 코드는 여기에 작성됩니다.
+        // 기존 글자 수 세기 기능도 여기에 통합하세요.
+        // 기존 글자 수 세기 기능을 위한 부분 (가정)
+        const inputText = document.getElementById('inputText');
+        const charCountSpan = document.getElementById('charCount');
+
+        inputText.addEventListener('input', updateCharCount);
+
+        function updateCharCount() {
+            charCountSpan.textContent = inputText.value.length;
+        }
+
+        // 자동 줄바꿈 기능
+        function applyWordWrap() {
+            const text = inputText.value;
+            const lineLength = 50; // 50자 단위 줄바꿈
+            let wrappedText = '';
+
+            for (let i = 0; i < text.length; i += lineLength) {
+                wrappedText += text.substring(i, i + lineLength) + '\n';
+            }
+
+            document.getElementById('output').innerText = wrappedText.trim(); // 마지막 줄바꿈 제거
+        }
+
+        // 텍스트 초기화 기능
+        function clearText() {
+            inputText.value = '';
+            document.getElementById('output').innerText = '';
+            updateCharCount(); // 글자 수 초기화
+        }
+
+        // 페이지 로드 시 초기 글자 수 업데이트
+        document.addEventListener('DOMContentLoaded', () => {
+            updateCharCount();
+        });
+    </script>
 </body>
 </html>
